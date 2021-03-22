@@ -22,22 +22,22 @@ insertStreamButton.addEventListener('click', insertNewStream);
 
 let startTime;
 const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
+const remoteVideos = document.querySelectorAll('.remoteVideo');
 
-localVideo.addEventListener('loadedmetadata', function() {
-  });
-
-remoteVideo.addEventListener('loadedmetadata', function() {
-  });
-
-remoteVideo.addEventListener('resize', () => {
-    // We'll use the first onsize callback as an indication that video has started
-  // playing out.
-  if (startTime) {
-    const elapsedTime = window.performance.now() - startTime;
-        startTime = null;
-  }
+localVideo.addEventListener('loadedmetadata', function () {
 });
+
+// remoteVideo.addEventListener('loadedmetadata', function() {
+//   });
+
+// remoteVideo.addEventListener('resize', () => {
+//     // We'll use the first onsize callback as an indication that video has started
+//   // playing out.
+//   if (startTime) {
+//     const elapsedTime = window.performance.now() - startTime;
+//         startTime = null;
+//   }
+// });
 
 let localStream;
 let pc1;
@@ -56,10 +56,10 @@ function getOtherPc(pc) {
 }
 
 async function start() {
-    startButton.disabled = true;
+  startButton.disabled = true;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
-        localVideo.srcObject = stream;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    localVideo.srcObject = stream;
     localStream = stream;
     callButton.disabled = false;
   } catch (e) {
@@ -69,8 +69,8 @@ async function start() {
 
 async function insertNewStream() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: false, video: true});
-        localVideo.srcObject = stream;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+    localVideo.srcObject = stream;
     stream.getTracks().forEach(track => pc1.addTrack(track, stream));
     try {
       const offer = await pc1.createOffer(offerOptions);
@@ -88,24 +88,24 @@ async function insertNewStream() {
 function getSelectedSdpSemantics() {
   const sdpSemanticsSelect = document.querySelector('#sdpSemantics');
   const option = sdpSemanticsSelect.options[sdpSemanticsSelect.selectedIndex];
-  return option.value === '' ? {} : {sdpSemantics: option.value};
+  return option.value === '' ? {} : { sdpSemantics: option.value };
 }
 
 async function call() {
   callButton.disabled = true;
   hangupButton.disabled = false;
-    startTime = window.performance.now();
+  startTime = window.performance.now();
   const videoTracks = localStream.getVideoTracks();
   const audioTracks = localStream.getAudioTracks();
   if (videoTracks.length > 0) {
-      }
+  }
   if (audioTracks.length > 0) {
-      }
+  }
   const configuration = getSelectedSdpSemantics();
-    pc1 = new RTCPeerConnection(configuration);
-    pc1.addEventListener('icecandidate', e => onIceCandidate(pc1, e));
+  pc1 = new RTCPeerConnection(configuration);
+  pc1.addEventListener('icecandidate', e => onIceCandidate(pc1, e));
   pc2 = new RTCPeerConnection(configuration);
-    pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e));
+  pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e));
   pc1.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc1, e));
   pc2.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc2, e));
   pc2.addEventListener('track', gotRemoteStream);
@@ -113,7 +113,7 @@ async function call() {
   localStream.getVideoTracks().forEach(track => pc1.addTrack(track, localStream));
 
   try {
-        const offer = await pc1.createOffer(offerOptions);
+    const offer = await pc1.createOffer(offerOptions);
     await onCreateOfferSuccess(offer);
   } catch (e) {
     onCreateSessionDescriptionError(e);
@@ -121,12 +121,12 @@ async function call() {
 }
 
 function onCreateSessionDescriptionError(error) {
-  }
+}
 
-let dessssc=null;
+let dessssc = null;
 
 async function onCreateOfferSuccess(desc) {
-      try {
+  try {
     await pc1.setLocalDescription(desc);
     onSetLocalSuccess(pc1);
   } catch (e) {
@@ -135,14 +135,14 @@ async function onCreateOfferSuccess(desc) {
 
   dessssc = desc;
 
-    try {
+  try {
     await pc2.setRemoteDescription(desc);
     onSetRemoteSuccess(pc2);
   } catch (e) {
     onSetSessionDescriptionError();
   }
 
-    // Since the 'remote' side has no media stream we need
+  // Since the 'remote' side has no media stream we need
   // to pass in the right constraints in order for it to
   // accept the incoming offer of audio and video.
   try {
@@ -154,7 +154,7 @@ async function onCreateOfferSuccess(desc) {
 }
 
 async function onCreateOfferSuccess2(desc) {
-      try {
+  try {
     await pc1.setLocalDescription(desc);
     onSetLocalSuccess(pc1);
   } catch (e) {
@@ -162,18 +162,18 @@ async function onCreateOfferSuccess2(desc) {
   }
 
   // console.log(dessssc.sdp)
-  // console.log(desc.sdp)
-    try {
-    await pc2.setRemoteDescription(dessssc).then(r=>console.log('r: ',r)).catch(e=>console.log(e));
+  console.log(desc.sdp)
+  try {
+    await pc2.setRemoteDescription(desc).then(r => console.log('r: ', r)).catch(e => console.log(e));
     onSetRemoteSuccess(pc2);
 
-  console.log('PC2 getReceivers: ', pc2.getReceivers());
+    console.log('PC2 getReceivers: ', pc2.getReceivers());
   } catch (e) {
     console.log(e)
     onSetSessionDescriptionError();
   }
 
-    // Since the 'remote' side has no media stream we need
+  // Since the 'remote' side has no media stream we need
   // to pass in the right constraints in order for it to
   // accept the incoming offer of audio and video.
   try {
@@ -185,29 +185,35 @@ async function onCreateOfferSuccess2(desc) {
 }
 
 function onSetLocalSuccess(pc) {
-  }
+}
 
 function onSetRemoteSuccess(pc) {
-  }
+}
 
 function onSetSessionDescriptionError(error) {
-  }
+}
 
+let rvs = 0;
 function gotRemoteStream(e) {
+  if (rvs == remoteVideos.length) {
+    rvs = 0;
+  }
+  remoteVideos[rvs].srcObject = e.streams[0];
   console.log('PC2 onTrack');
-  if (remoteVideo.srcObject !== e.streams[0]) {
-    remoteVideo.srcObject = e.streams[0];
-      }
+  rvs++;
+  // if (remoteVideo.srcObject !== e.streams[0]) {
+  //   remoteVideo.srcObject = e.streams[0];
+  //     }
 }
 
 async function onCreateAnswerSuccess(desc) {
-      try {
+  try {
     await pc2.setLocalDescription(desc);
     onSetLocalSuccess(pc2);
   } catch (e) {
     onSetSessionDescriptionError(e);
   }
-    try {
+  try {
     await pc1.setRemoteDescription(desc);
     onSetRemoteSuccess(pc1);
   } catch (e) {
@@ -222,21 +228,21 @@ async function onIceCandidate(pc, event) {
   } catch (e) {
     onAddIceCandidateError(pc, e);
   }
-  }
+}
 
 function onAddIceCandidateSuccess(pc) {
-  }
+}
 
 function onAddIceCandidateError(pc, error) {
-  }
+}
 
 function onIceStateChange(pc, event) {
   if (pc) {
-          }
+  }
 }
 
 function hangup() {
-    pc1.close();
+  pc1.close();
   pc2.close();
   pc1 = null;
   pc2 = null;
